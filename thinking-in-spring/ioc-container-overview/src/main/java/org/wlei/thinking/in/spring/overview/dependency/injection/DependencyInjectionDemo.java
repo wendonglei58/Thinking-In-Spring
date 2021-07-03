@@ -8,6 +8,7 @@ import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.core.env.Environment;
 import org.wlei.thinking.in.spring.overview.annotation.Super;
 import org.wlei.thinking.in.spring.overview.domain.User;
 import org.wlei.thinking.in.spring.overview.repository.UserRepository;
@@ -26,19 +27,32 @@ import java.util.Map;
  **/
 public class DependencyInjectionDemo {
     public static void main(String[] args) {
-        BeanFactory beanFactory = new ClassPathXmlApplicationContext("classpath:META-INF/dependency-injection-context.xml");
-        UserRepository userRepo = beanFactory.getBean(UserRepository.class);
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:META-INF/dependency-injection-context.xml");
+        UserRepository userRepo = applicationContext.getBean(UserRepository.class);
         System.out.println(userRepo.getUsers());
         System.out.println("---------------------------------------------------------------------------------");
         //DI
         System.out.println(userRepo.getBeanFactory().toString());
-        System.out.println((userRepo.getBeanFactory() == beanFactory));
+        System.out.println((userRepo.getBeanFactory() == applicationContext));
         // Dependency lookup is different from DI
-        //log.info(beanFactory.getBean(BeanFactory.class));
+        //log.info(applicationContext.getBean(BeanFactory.class));
         System.out.println("---------------------------------------------------------------------------------");
         // why ApplicationContext is the BeanFactory
         ObjectFactory<ApplicationContext> objectFactory = userRepo.getObjectFactory();
-        System.out.println(objectFactory.getObject() == beanFactory);
+        System.out.println(objectFactory.getObject() == applicationContext);
+        // built-in bean
+        Environment env = applicationContext.getBean(Environment.class);
+        System.out.println(env);
+        whoIsIocContainer(userRepo, applicationContext);
+    }
+
+    public static void whoIsIocContainer(UserRepository userRepository, ApplicationContext applicationContext) {
+        //why this not equal
+        System.out.println(userRepository.getBeanFactory() == applicationContext.getAutowireCapableBeanFactory());
+        // ApplicationContext is BeanFactory. In short, the BeanFactory provides the configuration framework and basic functionality, and the ApplicationContext adds more enterprise-specific functionality.
+        //ConfigurableApplicationContext -> ApplicationContext -> BeanFactory
+        //ConfigurableApplicationContext#getBeanFactory()  composition proxy pattern
+
     }
 
 }
