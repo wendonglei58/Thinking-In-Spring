@@ -39,6 +39,7 @@ public class DependencyInjectionDemo {
         System.out.println("---------------------------------------------------------------------------------");
         // why ApplicationContext is the BeanFactory
         ObjectFactory<ApplicationContext> objectFactory = userRepo.getObjectFactory();
+        System.out.println(objectFactory.getObject().toString());
         System.out.println(objectFactory.getObject() == applicationContext);
         // built-in bean
         Environment env = applicationContext.getBean(Environment.class);
